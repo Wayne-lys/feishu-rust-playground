@@ -5,9 +5,11 @@
       v-model:mode="mode"
       v-model:edition="edition"
       :isRunning="isRunning"
+      :isSaving="isSaving"
       @run="runCode"
       @format="formatCode"
       @clippy="clippyCode"
+      @save-gist="saveGist"
     />
     <Editor v-model="code" @run="runCode" />
     <Output :output="output" :error="error" />
@@ -20,6 +22,7 @@ import Editor from './components/Editor.vue'
 import Toolbar from './components/Toolbar.vue'
 import Output from './components/Output.vue'
 import { usePlayground } from './composables/usePlayground.js'
+import { useGist } from './composables/useGist.js'
 
 const STORAGE_KEY = 'feishu-rust-playground-code'
 const DEFAULT_CODE = `fn main() {\n    println!("Hello, world!");\n}`
@@ -31,14 +34,16 @@ const mode = ref('debug')
 const edition = ref('2021')
 
 const { execute, format, clippy, output, error, isRunning } = usePlayground(PROXY_URL)
+const { saveToGist, loadFromGist, isSaving, gistError } = useGist()
 
-onMounted(() => {
+onMounted(async () => {
   const saved = localStorage.getItem(STORAGE_KEY)
   if (saved) code.value = saved
 
   const gistId = new URLSearchParams(window.location.search).get('gist')
   if (gistId) {
-    loadGist(gistId)
+    const gistCode = await loadFromGist(gistId)
+    if (gistCode) code.value = gistCode
   }
 })
 
@@ -63,17 +68,9 @@ async function clippyCode() {
   await clippy(code.value, { edition: edition.value })
 }
 
-async function loadGist(id) {
-  try {
-    const res = await fetch(`https://api.github.com/gists/${id}`)
-    if (!res.ok) return
-    const data = await res.json()
-    const files = Object.values(data.files)
-    const rustFile = files.find(f => f.filename.endsWith('.rs')) || files[0]
-    if (rustFile) code.value = rustFile.content
-  } catch (e) {
-    console.error('Failed to load gist:', e)
-  }
+async function saveGist() {
+  const url = await saveToGist(code.value)
+  if (url) alert(`Saved! Gist URL: ${url}`)
 }
 </script>
 

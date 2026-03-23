@@ -5,6 +5,9 @@
     </button>
     <button class="btn" @click="$emit('format')" :disabled="isRunning">Format</button>
     <button class="btn" @click="$emit('clippy')" :disabled="isRunning">Clippy</button>
+    <button class="btn" @click="$emit('save-gist')" :disabled="isSaving">
+      {{ isSaving ? 'Saving...' : 'Save Gist' }}
+    </button>
 
     <select v-model="channelModel">
       <option value="stable">Stable</option>
@@ -34,10 +37,11 @@ const props = defineProps({
   channel: { type: String, default: 'stable' },
   mode: { type: String, default: 'debug' },
   edition: { type: String, default: '2021' },
-  isRunning: { type: Boolean, default: false }
+  isRunning: { type: Boolean, default: false },
+  isSaving: { type: Boolean, default: false }
 })
 
-const emit = defineEmits(['run', 'format', 'clippy', 'update:channel', 'update:mode', 'update:edition'])
+const emit = defineEmits(['run', 'format', 'clippy', 'save-gist', 'update:channel', 'update:mode', 'update:edition'])
 
 const channelModel = computed({
   get: () => props.channel,
