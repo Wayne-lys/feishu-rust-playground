@@ -26,7 +26,7 @@ import { useGist } from './composables/useGist.js'
 
 const STORAGE_KEY = 'feishu-rust-playground-code'
 const DEFAULT_CODE = `fn main() {\n    println!("Hello, world!");\n}`
-const PROXY_URL = import.meta.env.VITE_PROXY_URL || ''
+const PROXY_URL = import.meta.env.VITE_PROXY_URL || 'https://play.rust-lang.org'
 
 const code = ref(DEFAULT_CODE)
 const channel = ref('stable')
