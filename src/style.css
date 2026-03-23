@@ -6,7 +6,42 @@
 
 html, body, #app {
   height: 100%;
-  background: #1e1e1e;
-  color: #ccc;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Dark theme (default) */
+:root {
+  --bg: #1e1e1e;
+  --bg-secondary: #1a1a1a;
+  --bg-toolbar: #1e1e1e;
+  --bg-btn: #2d2d2d;
+  --text: #ccc;
+  --text-muted: #888;
+  --text-hint: #666;
+  --border: #3a3a3a;
+  --border-btn: #555;
+  --stdout: #adbac7;
+  --stderr: #f97583;
+  --placeholder: #555;
+}
+
+/* Light theme */
+[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-toolbar: #f0f0f0;
+  --bg-btn: #e8e8e8;
+  --text: #24292e;
+  --text-muted: #666;
+  --text-hint: #999;
+  --border: #d0d0d0;
+  --border-btn: #ccc;
+  --stdout: #24292e;
+  --stderr: #d73a49;
+  --placeholder: #999;
+}
+
+html {
+  background: var(--bg);
+  color: var(--text);
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="toolbar">
     <button class="btn btn-run" @click="$emit('run')" :disabled="isRunning">
-      {{ isRunning ? '⏳ Running...' : '▶ Run' }}
+      {{ isRunning ? '... Running' : '▶ Run' }}
     </button>
     <button class="btn" @click="$emit('format')" :disabled="isRunning">Format</button>
     <button class="btn" @click="$emit('clippy')" :disabled="isRunning">Clippy</button>
@@ -26,6 +26,10 @@
       <option value="2018">2018</option>
     </select>
 
+    <button class="btn btn-theme" @click="$emit('toggle-theme')" :title="dark ? 'Switch to light' : 'Switch to dark'">
+      {{ dark ? '☀️' : '🌙' }}
+    </button>
+
     <span class="shortcut-hint">Ctrl+Enter to run</span>
   </div>
 </template>
@@ -38,10 +42,11 @@ const props = defineProps({
   mode: { type: String, default: 'debug' },
   edition: { type: String, default: '2021' },
   isRunning: { type: Boolean, default: false },
-  isSaving: { type: Boolean, default: false }
+  isSaving: { type: Boolean, default: false },
+  dark: { type: Boolean, default: true }
 })
 
-const emit = defineEmits(['run', 'format', 'clippy', 'save-gist', 'update:channel', 'update:mode', 'update:edition'])
+const emit = defineEmits(['run', 'format', 'clippy', 'save-gist', 'toggle-theme', 'update:channel', 'update:mode', 'update:edition'])
 
 const channelModel = computed({
   get: () => props.channel,
@@ -63,19 +68,19 @@ const editionModel = computed({
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background: #1e1e1e;
-  border-bottom: 1px solid #3a3a3a;
+  background: var(--bg-toolbar);
+  border-bottom: 1px solid var(--border);
 }
 .btn {
   padding: 6px 16px;
-  border: 1px solid #555;
+  border: 1px solid var(--border-btn);
   border-radius: 4px;
-  background: #2d2d2d;
-  color: #ccc;
+  background: var(--bg-btn);
+  color: var(--text);
   cursor: pointer;
   font-size: 14px;
 }
-.btn:hover { background: #3a3a3a; }
+.btn:hover { opacity: 0.8; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-run {
   background: #2ea043;
@@ -84,17 +89,22 @@ const editionModel = computed({
   font-weight: bold;
 }
 .btn-run:hover { background: #3fb950; }
+.btn-theme {
+  padding: 4px 8px;
+  font-size: 16px;
+  line-height: 1;
+}
 select {
   padding: 4px 8px;
-  background: #2d2d2d;
-  color: #ccc;
-  border: 1px solid #555;
+  background: var(--bg-btn);
+  color: var(--text);
+  border: 1px solid var(--border-btn);
   border-radius: 4px;
   font-size: 13px;
 }
 .shortcut-hint {
   margin-left: auto;
-  color: #666;
+  color: var(--text-hint);
   font-size: 12px;
 }
 </style>

@@ -6,12 +6,14 @@
       v-model:edition="edition"
       :isRunning="isRunning"
       :isSaving="isSaving"
+      :dark="isDark"
       @run="runCode"
       @format="formatCode"
       @clippy="clippyCode"
       @save-gist="saveGist"
+      @toggle-theme="toggleTheme"
     />
-    <Editor v-model="code" @run="runCode" />
+    <Editor v-model="code" :dark="isDark" @run="runCode" />
     <Output :output="output" :error="error" />
   </div>
 </template>
@@ -25,6 +27,7 @@ import { usePlayground } from './composables/usePlayground.js'
 import { useGist } from './composables/useGist.js'
 
 const STORAGE_KEY = 'feishu-rust-playground-code'
+const THEME_KEY = 'feishu-rust-playground-theme'
 const DEFAULT_CODE = `fn main() {\n    println!("Hello, world!");\n}`
 const PROXY_URL = import.meta.env.VITE_PROXY_URL || 'https://play.rust-lang.org'
 
@@ -32,14 +35,22 @@ const code = ref(DEFAULT_CODE)
 const channel = ref('stable')
 const mode = ref('debug')
 const edition = ref('2021')
+const isDark = ref(true)
 
 const { execute, format, clippy, output, error, isRunning } = usePlayground(PROXY_URL)
 const { saveToGist, loadFromGist, isSaving, gistError } = useGist()
 
 onMounted(async () => {
+  // Restore theme
+  const savedTheme = localStorage.getItem(THEME_KEY)
+  if (savedTheme) isDark.value = savedTheme === 'dark'
+  applyTheme()
+
+  // Restore code
   const saved = localStorage.getItem(STORAGE_KEY)
   if (saved) code.value = saved
 
+  // Load from gist URL param
   const gistId = new URLSearchParams(window.location.search).get('gist')
   if (gistId) {
     const gistCode = await loadFromGist(gistId)
@@ -50,6 +61,16 @@ onMounted(async () => {
 watch(code, (val) => {
   localStorage.setItem(STORAGE_KEY, val)
 })
+
+function toggleTheme() {
+  isDark.value = !isDark.value
+  localStorage.setItem(THEME_KEY, isDark.value ? 'dark' : 'light')
+  applyTheme()
+}
+
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light')
+}
 
 async function runCode() {
   await execute(code.value, {

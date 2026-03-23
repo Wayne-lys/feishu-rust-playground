@@ -20,30 +20,30 @@ defineProps({
 
 <style scoped>
 .output-panel {
-  border-top: 1px solid #3a3a3a;
-  background: #1a1a1a;
+  border-top: 1px solid var(--border);
+  background: var(--bg-secondary);
 }
 .output-header {
   padding: 6px 12px;
   font-size: 12px;
-  color: #888;
-  background: #1e1e1e;
-  border-bottom: 1px solid #3a3a3a;
+  color: var(--text-muted);
+  background: var(--bg-toolbar);
+  border-bottom: 1px solid var(--border);
 }
 .output-content {
   margin: 0;
   padding: 12px;
   font-family: 'Cascadia Code', 'Fira Code', monospace;
   font-size: 13px;
-  color: #ccc;
+  color: var(--text);
   min-height: 80px;
   max-height: 200px;
   overflow: auto;
   white-space: pre-wrap;
 }
-.stderr { color: #f97583; }
-.stdout { color: #adbac7; }
-.error { color: #f97583; }
-.placeholder { color: #555; }
-.no-output { color: #555; font-style: italic; }
+.stderr { color: var(--stderr); }
+.stdout { color: var(--stdout); }
+.error { color: var(--stderr); }
+.placeholder { color: var(--placeholder); }
+.no-output { color: var(--placeholder); font-style: italic; }
 </style>
