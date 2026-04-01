@@ -4,6 +4,7 @@
       v-model:channel="channel"
       v-model:mode="mode"
       v-model:edition="edition"
+      v-model:blockName="blockName"
       :isRunning="isRunning"
       :isSaving="isSaving"
       :dark="isDark"
@@ -19,7 +20,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import Editor from './components/Editor.vue'
 import Toolbar from './components/Toolbar.vue'
 import Output from './components/Output.vue'
@@ -27,11 +28,13 @@ import { usePlayground } from './composables/usePlayground.js'
 import { useGist } from './composables/useGist.js'
 
 const params = new URLSearchParams(window.location.search)
-const blockId = params.get('blockId') || ''
-const STORAGE_KEY = blockId ? `feishu-rust-playground-code-${blockId}` : 'feishu-rust-playground-code'
-const THEME_KEY = blockId ? `feishu-rust-playground-theme-${blockId}` : 'feishu-rust-playground-theme'
+const BLOCK_NAME_KEY = 'feishu-rust-playground-block-name'
 const DEFAULT_CODE = `fn main() {\n    println!("Hello, world!");\n}`
 const PROXY_URL = import.meta.env.VITE_PROXY_URL || 'https://play.rust-lang.org'
+
+const blockName = ref(localStorage.getItem(BLOCK_NAME_KEY) || '')
+const storageKey = computed(() => blockName.value ? `feishu-rust-playground-code-${blockName.value}` : 'feishu-rust-playground-code')
+const themeKey = computed(() => blockName.value ? `feishu-rust-playground-theme-${blockName.value}` : 'feishu-rust-playground-theme')
 
 const code = ref(DEFAULT_CODE)
 const channel = ref('stable')
@@ -44,12 +47,12 @@ const { saveToGist, loadFromGist, isSaving, gistError } = useGist()
 
 onMounted(async () => {
   // Restore theme
-  const savedTheme = localStorage.getItem(THEME_KEY)
+  const savedTheme = localStorage.getItem(themeKey.value)
   if (savedTheme) isDark.value = savedTheme === 'dark'
   applyTheme()
 
   // Restore code
-  const saved = localStorage.getItem(STORAGE_KEY)
+  const saved = localStorage.getItem(storageKey.value)
   if (saved) code.value = saved
 
   // Load from gist URL param
@@ -60,13 +63,21 @@ onMounted(async () => {
   }
 })
 
+// Save code when it changes
 watch(code, (val) => {
-  localStorage.setItem(STORAGE_KEY, val)
+  localStorage.setItem(storageKey.value, val)
+})
+
+// When blockName changes, save it and load the corresponding code
+watch(blockName, (name) => {
+  localStorage.setItem(BLOCK_NAME_KEY, name)
+  const saved = localStorage.getItem(storageKey.value)
+  code.value = saved || DEFAULT_CODE
 })
 
 function toggleTheme() {
   isDark.value = !isDark.value
-  localStorage.setItem(THEME_KEY, isDark.value ? 'dark' : 'light')
+  localStorage.setItem(themeKey.value, isDark.value ? 'dark' : 'light')
   applyTheme()
 }
 

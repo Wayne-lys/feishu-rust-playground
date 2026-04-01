@@ -30,6 +30,14 @@
       {{ dark ? '☀️' : '🌙' }}
     </button>
 
+    <input
+      class="block-name-input"
+      :value="blockName"
+      @change="$emit('update:blockName', $event.target.value.trim())"
+      placeholder="Block name"
+      title="Give this block a unique name to save code independently"
+    />
+
     <span class="shortcut-hint">Ctrl+Enter to run</span>
   </div>
 </template>
@@ -43,10 +51,11 @@ const props = defineProps({
   edition: { type: String, default: '2021' },
   isRunning: { type: Boolean, default: false },
   isSaving: { type: Boolean, default: false },
-  dark: { type: Boolean, default: true }
+  dark: { type: Boolean, default: true },
+  blockName: { type: String, default: '' }
 })
 
-const emit = defineEmits(['run', 'format', 'clippy', 'save-gist', 'toggle-theme', 'update:channel', 'update:mode', 'update:edition'])
+const emit = defineEmits(['run', 'format', 'clippy', 'save-gist', 'toggle-theme', 'update:channel', 'update:mode', 'update:edition', 'update:blockName'])
 
 const channelModel = computed({
   get: () => props.channel,
@@ -93,6 +102,15 @@ const editionModel = computed({
   padding: 4px 8px;
   font-size: 16px;
   line-height: 1;
+}
+.block-name-input {
+  padding: 4px 8px;
+  background: var(--bg-btn);
+  color: var(--text);
+  border: 1px solid var(--border-btn);
+  border-radius: 4px;
+  font-size: 13px;
+  width: 120px;
 }
 select {
   padding: 4px 8px;
