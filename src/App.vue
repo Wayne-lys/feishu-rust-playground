@@ -26,8 +26,10 @@ import Output from './components/Output.vue'
 import { usePlayground } from './composables/usePlayground.js'
 import { useGist } from './composables/useGist.js'
 
-const STORAGE_KEY = 'feishu-rust-playground-code'
-const THEME_KEY = 'feishu-rust-playground-theme'
+const params = new URLSearchParams(window.location.search)
+const blockId = params.get('blockId') || ''
+const STORAGE_KEY = blockId ? `feishu-rust-playground-code-${blockId}` : 'feishu-rust-playground-code'
+const THEME_KEY = blockId ? `feishu-rust-playground-theme-${blockId}` : 'feishu-rust-playground-theme'
 const DEFAULT_CODE = `fn main() {\n    println!("Hello, world!");\n}`
 const PROXY_URL = import.meta.env.VITE_PROXY_URL || 'https://play.rust-lang.org'
 
@@ -51,7 +53,7 @@ onMounted(async () => {
   if (saved) code.value = saved
 
   // Load from gist URL param
-  const gistId = new URLSearchParams(window.location.search).get('gist')
+  const gistId = params.get('gist')
   if (gistId) {
     const gistCode = await loadFromGist(gistId)
     if (gistCode) code.value = gistCode
