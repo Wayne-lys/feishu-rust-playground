@@ -1,12 +1,12 @@
 <template>
   <div class="toolbar">
     <button class="btn btn-run" @click="$emit('run')" :disabled="isRunning">
-      {{ isRunning ? '... Running' : '▶ Run' }}
+      {{ isRunning ? '运行中...' : '▶ 运行' }}
     </button>
-    <button class="btn" @click="$emit('format')" :disabled="isRunning">Format</button>
+    <button class="btn" @click="$emit('format')" :disabled="isRunning">格式化</button>
     <button class="btn" @click="$emit('clippy')" :disabled="isRunning">Clippy</button>
     <button class="btn" @click="$emit('save-gist')" :disabled="isSaving">
-      {{ isSaving ? 'Saving...' : 'Save Gist' }}
+      {{ isSaving ? '保存中...' : '保存 Gist' }}
     </button>
 
     <select v-model="channelModel">
@@ -26,7 +26,7 @@
       <option value="2018">2018</option>
     </select>
 
-    <button class="btn btn-theme" @click="$emit('toggle-theme')" :title="dark ? 'Switch to light' : 'Switch to dark'">
+    <button class="btn btn-theme" @click="$emit('toggle-theme')" :title="dark ? '切换亮色' : '切换暗色'">
       {{ dark ? '☀️' : '🌙' }}
     </button>
 
@@ -34,11 +34,11 @@
       class="block-name-input"
       :value="blockName"
       @change="$emit('update:blockName', $event.target.value.trim())"
-      placeholder="Block name"
-      title="Give this block a unique name to save code independently"
+      placeholder="代码块名称"
+      title="给代码块起个名字，多个块的代码独立保存"
     />
 
-    <span class="shortcut-hint">Ctrl+Enter to run</span>
+    <span class="shortcut-hint">Ctrl+Enter 运行</span>
   </div>
 </template>
 

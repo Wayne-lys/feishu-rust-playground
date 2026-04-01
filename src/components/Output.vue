@@ -1,13 +1,13 @@
 <template>
   <div class="output-panel">
-    <div class="output-header">Output</div>
+    <div class="output-header">输出</div>
     <pre class="output-content" v-if="output">
       <span v-if="output.stderr" class="stderr">{{ output.stderr }}</span>
       <span v-if="output.stdout" class="stdout">{{ output.stdout }}</span>
-      <span v-if="!output.stdout && !output.stderr" class="no-output">(no output)</span>
+      <span v-if="!output.stdout && !output.stderr" class="no-output">（无输出）</span>
     </pre>
-    <pre class="output-content error" v-else-if="error">Error: {{ error }}</pre>
-    <pre class="output-content placeholder" v-else>Click "Run" or press Ctrl+Enter to execute your code.</pre>
+    <pre class="output-content error" v-else-if="error">错误: {{ error }}</pre>
+    <pre class="output-content placeholder" v-else>点击"运行"或按 Ctrl+Enter 执行代码</pre>
   </div>
 </template>
 

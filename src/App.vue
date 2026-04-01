@@ -104,7 +104,7 @@ async function clippyCode() {
 
 async function saveGist() {
   const url = await saveToGist(code.value)
-  if (url) alert(`Saved! Gist URL: ${url}`)
+  if (url) alert(`已保存！Gist 链接: ${url}`)
 }
 </script>
 
