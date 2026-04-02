@@ -4,10 +4,10 @@
       v-model:channel="channel"
       v-model:mode="mode"
       v-model:edition="edition"
-      v-model:blockName="blockName"
       :isRunning="isRunning"
       :isSaving="isSaving"
       :dark="isDark"
+      :blockId="blockId"
       @run="runCode"
       @format="formatCode"
       @clippy="clippyCode"
@@ -26,15 +26,15 @@ import Toolbar from './components/Toolbar.vue'
 import Output from './components/Output.vue'
 import { usePlayground } from './composables/usePlayground.js'
 import { useGist } from './composables/useGist.js'
+import { getBlockIdFromSearch, createScopedStorageKey } from './composables/playgroundIdentity.js'
 
 const params = new URLSearchParams(window.location.search)
-const BLOCK_NAME_KEY = 'feishu-rust-playground-block-name'
 const DEFAULT_CODE = `fn main() {\n    println!("Hello, world!");\n}`
 const PROXY_URL = import.meta.env.VITE_PROXY_URL || 'https://play.rust-lang.org'
+const blockId = getBlockIdFromSearch(window.location.search)
 
-const blockName = ref(localStorage.getItem(BLOCK_NAME_KEY) || '')
-const storageKey = computed(() => blockName.value ? `feishu-rust-playground-code-${blockName.value}` : 'feishu-rust-playground-code')
-const themeKey = computed(() => blockName.value ? `feishu-rust-playground-theme-${blockName.value}` : 'feishu-rust-playground-theme')
+const storageKey = computed(() => createScopedStorageKey('feishu-rust-playground-code', blockId))
+const themeKey = computed(() => createScopedStorageKey('feishu-rust-playground-theme', blockId))
 
 const code = ref(DEFAULT_CODE)
 const channel = ref('stable')
@@ -43,19 +43,16 @@ const edition = ref('2021')
 const isDark = ref(true)
 
 const { execute, format, clippy, output, error, isRunning } = usePlayground(PROXY_URL)
-const { saveToGist, loadFromGist, isSaving, gistError } = useGist()
+const { saveToGist, loadFromGist, isSaving } = useGist()
 
 onMounted(async () => {
-  // Restore theme
   const savedTheme = localStorage.getItem(themeKey.value)
   if (savedTheme) isDark.value = savedTheme === 'dark'
   applyTheme()
 
-  // Restore code
   const saved = localStorage.getItem(storageKey.value)
   if (saved) code.value = saved
 
-  // Load from gist URL param
   const gistId = params.get('gist')
   if (gistId) {
     const gistCode = await loadFromGist(gistId)
@@ -63,16 +60,8 @@ onMounted(async () => {
   }
 })
 
-// Save code when it changes
 watch(code, (val) => {
   localStorage.setItem(storageKey.value, val)
-})
-
-// When blockName changes, save it and load the corresponding code
-watch(blockName, (name) => {
-  localStorage.setItem(BLOCK_NAME_KEY, name)
-  const saved = localStorage.getItem(storageKey.value)
-  code.value = saved || DEFAULT_CODE
 })
 
 function toggleTheme() {
@@ -104,7 +93,7 @@ async function clippyCode() {
 
 async function saveGist() {
   const url = await saveToGist(code.value)
-  if (url) alert(`已保存！Gist 链接: ${url}`)
+  if (url) alert(`\u5df2\u4fdd\u5b58\uff01Gist \u94fe\u63a5: ${url}`)
 }
 </script>
 

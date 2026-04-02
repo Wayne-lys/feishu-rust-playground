@@ -1,12 +1,12 @@
 <template>
   <div class="toolbar">
     <button class="btn btn-run" @click="$emit('run')" :disabled="isRunning">
-      {{ isRunning ? '运行中...' : '▶ 运行' }}
+      {{ isRunning ? runText.running : runText.idle }}
     </button>
-    <button class="btn" @click="$emit('format')" :disabled="isRunning">格式化</button>
+    <button class="btn" @click="$emit('format')" :disabled="isRunning">{{ formatText }}</button>
     <button class="btn" @click="$emit('clippy')" :disabled="isRunning">Clippy</button>
     <button class="btn" @click="$emit('save-gist')" :disabled="isSaving">
-      {{ isSaving ? '保存中...' : '保存 Gist' }}
+      {{ isSaving ? saveText.saving : saveText.idle }}
     </button>
 
     <select v-model="channelModel">
@@ -26,19 +26,15 @@
       <option value="2018">2018</option>
     </select>
 
-    <button class="btn btn-theme" @click="$emit('toggle-theme')" :title="dark ? '切换亮色' : '切换暗色'">
-      {{ dark ? '☀️' : '🌙' }}
+    <button class="btn btn-theme" @click="$emit('toggle-theme')" :title="dark ? lightTitle : darkTitle">
+      {{ dark ? sunIcon : moonIcon }}
     </button>
 
-    <input
-      class="block-name-input"
-      :value="blockName"
-      @change="$emit('update:blockName', $event.target.value.trim())"
-      placeholder="代码块名称"
-      title="给代码块起个名字，多个块的代码独立保存"
-    />
+    <span v-if="blockId" class="block-badge" :title="`block=${blockId}`">
+      #{{ blockId }}
+    </span>
 
-    <span class="shortcut-hint">Ctrl+Enter 运行</span>
+    <span class="shortcut-hint">{{ shortcutHint }}</span>
   </div>
 </template>
 
@@ -52,19 +48,38 @@ const props = defineProps({
   isRunning: { type: Boolean, default: false },
   isSaving: { type: Boolean, default: false },
   dark: { type: Boolean, default: true },
-  blockName: { type: String, default: '' }
+  blockId: { type: String, default: '' }
 })
 
-const emit = defineEmits(['run', 'format', 'clippy', 'save-gist', 'toggle-theme', 'update:channel', 'update:mode', 'update:edition', 'update:blockName'])
+const emit = defineEmits(['run', 'format', 'clippy', 'save-gist', 'toggle-theme', 'update:channel', 'update:mode', 'update:edition'])
+
+const runText = {
+  idle: '\u25b6 \u8fd0\u884c',
+  running: '\u8fd0\u884c\u4e2d...'
+}
+
+const saveText = {
+  idle: '\u4fdd\u5b58 Gist',
+  saving: '\u4fdd\u5b58\u4e2d...'
+}
+
+const formatText = '\u683c\u5f0f\u5316'
+const lightTitle = '\u5207\u6362\u4eae\u8272'
+const darkTitle = '\u5207\u6362\u6697\u8272'
+const shortcutHint = 'Ctrl+Enter \u8fd0\u884c'
+const sunIcon = '\u2600\ufe0f'
+const moonIcon = '\ud83c\udf19'
 
 const channelModel = computed({
   get: () => props.channel,
   set: (v) => emit('update:channel', v)
 })
+
 const modeModel = computed({
   get: () => props.mode,
   set: (v) => emit('update:mode', v)
 })
+
 const editionModel = computed({
   get: () => props.edition,
   set: (v) => emit('update:edition', v)
@@ -80,6 +95,7 @@ const editionModel = computed({
   background: var(--bg-toolbar);
   border-bottom: 1px solid var(--border);
 }
+
 .btn {
   padding: 6px 16px;
   border: 1px solid var(--border-btn);
@@ -89,29 +105,36 @@ const editionModel = computed({
   cursor: pointer;
   font-size: 14px;
 }
+
 .btn:hover { opacity: 0.8; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
 .btn-run {
   background: #2ea043;
   border-color: #2ea043;
   color: #fff;
   font-weight: bold;
 }
+
 .btn-run:hover { background: #3fb950; }
+
 .btn-theme {
   padding: 4px 8px;
   font-size: 16px;
   line-height: 1;
 }
-.block-name-input {
+
+.block-badge {
   padding: 4px 8px;
-  background: var(--bg-btn);
-  color: var(--text);
+  min-width: 48px;
   border: 1px solid var(--border-btn);
   border-radius: 4px;
+  background: var(--bg-btn);
+  color: var(--text);
   font-size: 13px;
-  width: 120px;
+  text-align: center;
 }
+
 select {
   padding: 4px 8px;
   background: var(--bg-btn);
@@ -120,6 +143,7 @@ select {
   border-radius: 4px;
   font-size: 13px;
 }
+
 .shortcut-hint {
   margin-left: auto;
   color: var(--text-hint);
